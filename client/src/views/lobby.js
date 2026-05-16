@@ -58,6 +58,32 @@ export function renderLobby(appEl) {
         </div>
       </div>` : ''}
 
+      ${isHost ? `
+      <div class="card">
+        <h3 style="margin-bottom:12px">Choose Game Mode</h3>
+        <div class="mode-selector" id="mode-selector">
+          <label class="mode-card active" data-mode="classic_draw_guess">
+            <input type="radio" name="mode" value="classic_draw_guess" checked hidden />
+            <span class="mode-icon">🎨</span>
+            <span class="mode-name">Draw & Guess</span>
+            <span class="mode-desc">Classic Skribble-style</span>
+          </label>
+          <label class="mode-card" data-mode="facts">
+            <input type="radio" name="mode" value="facts" hidden />
+            <span class="mode-icon">📚</span>
+            <span class="mode-name">Facts Stream</span>
+            <span class="mode-desc">Learn about the topic</span>
+          </label>
+          <label class="mode-card" data-mode="achievement">
+            <input type="radio" name="mode" value="achievement" hidden />
+            <span class="mode-icon">🏆</span>
+            <span class="mode-name">Guess by Clues</span>
+            <span class="mode-desc">Achievements & trivia</span>
+          </label>
+        </div>
+        <div id="topic-status" class="badge badge-accent" style="margin-top:8px">⏳ Loading topic data...</div>
+      </div>` : ''}
+
       <div class="flex gap-md" style="margin-top:auto;padding:16px 0">
         <button class="btn btn-secondary" id="leave-btn" style="flex:1">🚪 Leave</button>
         ${isHost ? '<button class="btn btn-primary" id="start-btn" style="flex:2">🎮 Start Game</button>' : '<p style="text-align:center;color:var(--text-secondary);flex:2">Waiting for host to start...</p>'}
@@ -78,6 +104,19 @@ export function renderLobby(appEl) {
     } catch { /* ignore */ }
   });
 
+  // Mode selector
+  let selectedMode = 'classic_draw_guess';
+  const modeSelector = appEl.querySelector('#mode-selector');
+  if (modeSelector) {
+    modeSelector.querySelectorAll('.mode-card').forEach((card) => {
+      card.addEventListener('click', () => {
+        modeSelector.querySelectorAll('.mode-card').forEach((c) => c.classList.remove('active'));
+        card.classList.add('active');
+        selectedMode = card.dataset.mode;
+      });
+    });
+  }
+
   // Leave
   appEl.querySelector('#leave-btn').addEventListener('click', () => {
     getSocket().emit('room:leave');
@@ -85,13 +124,13 @@ export function renderLobby(appEl) {
     navigate('home');
   });
 
-  // Start
+  // Start — send selected mode
   const startBtn = appEl.querySelector('#start-btn');
   if (startBtn) {
     startBtn.addEventListener('click', async () => {
       startBtn.textContent = '⏳ Starting...';
       startBtn.disabled = true;
-      const res = await emitWithAck('game:start');
+      const res = await emitWithAck('game:start', { mode: selectedMode });
       if (!res.success) {
         appEl.querySelector('#lobby-error').textContent = res.error;
         startBtn.textContent = '🎮 Start Game';
@@ -119,18 +158,35 @@ export function renderLobby(appEl) {
 
   const onGameStarted = (data) => {
     state.set('gamePhase', 'choosing');
+    state.set('gameMode', data.mode || 'classic_draw_guess');
     navigate('game');
+  };
+
+  const onTopicReady = (data) => {
+    const statusEl = appEl.querySelector('#topic-status');
+    if (statusEl) {
+      statusEl.className = 'badge badge-success';
+      statusEl.textContent = `✅ Topic ready: ${data.wordCount} words, ${data.factCount} facts, ${data.entityCount} entities`;
+    }
+  };
+
+  const onError = (data) => {
+    appEl.querySelector('#lobby-error').textContent = data.error;
   };
 
   socket.on('room:player_joined', onJoin);
   socket.on('room:player_left', onLeft);
   socket.on('game:started', onGameStarted);
+  socket.on('room:topic_ready', onTopicReady);
+  socket.on('game:error', onError);
 
   // Cleanup when leaving lobby
   const cleanup = state.on('currentView', () => {
     socket.off('room:player_joined', onJoin);
     socket.off('room:player_left', onLeft);
     socket.off('game:started', onGameStarted);
+    socket.off('room:topic_ready', onTopicReady);
+    socket.off('game:error', onError);
     cleanup();
   });
 }

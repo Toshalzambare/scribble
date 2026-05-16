@@ -385,6 +385,79 @@ select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csv
 .standing-row .name { flex: 1; font-weight: 600; }
 .standing-row .score { font-weight: 800; color: var(--accent-hover); font-size: 1.1rem; }
 
+/* ====================== MODE SELECTOR (Lobby) ====================== */
+.mode-selector {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+}
+.mode-card {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 16px 8px; border-radius: var(--radius);
+  background: var(--bg-card); border: 2px solid var(--border);
+  cursor: pointer; transition: all var(--transition); text-align: center;
+}
+.mode-card:hover { border-color: var(--accent); background: rgba(124,92,252,0.05); }
+.mode-card.active { border-color: var(--accent); background: var(--accent-glow); }
+.mode-icon { font-size: 1.8rem; }
+.mode-name { font-weight: 700; font-size: 0.85rem; }
+.mode-desc { font-size: 0.7rem; color: var(--text-muted); }
+
+/* ====================== FACTS MODE ====================== */
+.facts-area {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 24px; gap: 20px;
+}
+.fact-card {
+  max-width: 600px; width: 100%; text-align: center;
+  min-height: 160px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 12px;
+}
+.fact-text {
+  font-size: 1.15rem; line-height: 1.6; color: var(--text-primary);
+}
+.fact-meta {
+  font-size: 0.8rem; color: var(--text-muted);
+}
+.fact-actions {
+  display: flex; align-items: center; gap: 12px;
+}
+
+/* ====================== ACHIEVEMENT MODE ====================== */
+.achievement-area {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 24px; gap: 16px;
+}
+.clue-card {
+  max-width: 600px; width: 100%; text-align: center;
+  min-height: 180px; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 12px;
+}
+.clue-number {
+  font-size: 0.85rem; color: var(--text-secondary); font-weight: 600;
+}
+.clue-text {
+  font-size: 1.2rem; line-height: 1.5; color: var(--text-primary);
+  font-weight: 500;
+}
+.clue-difficulty {
+  font-size: 0.75rem; font-weight: 800; letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.achievement-actions {
+  display: flex; align-items: center; gap: 12px;
+}
+.btn-buzz {
+  font-size: 1.2rem; padding: 16px 40px;
+  animation: buzzGlow 2s infinite alternate;
+}
+@keyframes buzzGlow {
+  from { box-shadow: 0 4px 16px var(--accent-glow); }
+  to { box-shadow: 0 4px 32px rgba(124,92,252,0.5); }
+}
+.answer-form {
+  display: flex; gap: 8px; max-width: 400px; width: 100%;
+}
+.answer-form .input { flex: 1; }
+
 /* ====================== RESPONSIVE ====================== */
 @media (max-width: 768px) {
   .game-body { flex-direction: column; }
@@ -393,6 +466,9 @@ select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csv
   .player-row { flex-shrink: 0; padding: 4px 8px; }
   .lobby-settings { grid-template-columns: 1fr; }
   .word-display { font-size: 1rem; letter-spacing: 2px; }
+  .mode-selector { grid-template-columns: 1fr; }
+  .facts-area, .achievement-area { padding: 16px; }
+  .fact-text, .clue-text { font-size: 1rem; }
 }
 
 @media (min-width: 769px) {

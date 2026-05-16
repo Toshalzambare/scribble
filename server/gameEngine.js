@@ -1,4 +1,5 @@
 import { getWordChoices } from './wordBank.js';
+import { getTopicWords } from './topicEngine.js';
 
 /**
  * Game Engine for Mode 1: Classic Draw & Guess
@@ -34,7 +35,12 @@ export function startWordChoice(room) {
   const gs = room.gameState;
   gs.phase = 'choosing';
   gs.wordChosen = false;
-  gs.wordChoices = getWordChoices(room.topic);
+  // Use Topic Engine words if available, fall back to static word bank
+  if (room.topicData) {
+    gs.wordChoices = getTopicWords(room.topicData, 3);
+  } else {
+    gs.wordChoices = getWordChoices(room.topic);
+  }
   gs.currentWord = null;
   gs.guessedPlayers = new Set();
   gs.hints = [];
