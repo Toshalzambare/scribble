@@ -1,9 +1,0 @@
-node_modules
-.env
-.git
-.gitignore
-*.md
-dist
-client/dist
-.vscode
-.idea

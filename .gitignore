@@ -1,9 +1,6 @@
 node_modules/
 dist/
-client/dist/
+build/
 .env
-*.log
+.env.local
 .DS_Store
-Thumbs.db
-.vscode/
-.idea/
